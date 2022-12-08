@@ -755,9 +755,9 @@ export function getBumpedLaneForHydration(
 
   let lane;
   switch (renderLane) {
-    case SyncLane:
-      lane = SyncHydrationLane;
-      break;
+    //case SyncLane:
+    //  lane = SyncHydrationLane;
+    //  break;
     case InputContinuousLane:
       lane = InputContinuousHydrationLane;
       break;
