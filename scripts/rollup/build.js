@@ -19,7 +19,7 @@ const sizes = require('./plugins/sizes-plugin');
 const useForks = require('./plugins/use-forks-plugin');
 const stripUnusedImports = require('./plugins/strip-unused-imports');
 const Packaging = require('./packaging');
-const {asyncRimRaf} = require('./utils');
+const { asyncRimRaf } = require('./utils');
 const codeFrame = require('babel-code-frame');
 const Wrappers = require('./wrappers');
 
@@ -65,7 +65,7 @@ const {
   BROWSER_SCRIPT,
 } = Bundles.bundleTypes;
 
-const {getFilename} = Bundles;
+const { getFilename } = Bundles;
 
 function parseRequestedNames(names, toCase) {
   let result = [];
@@ -100,22 +100,22 @@ const syncWWWPath = argv['sync-www'];
 const babelPlugins = [
   // These plugins filter out non-ES2015.
   '@babel/plugin-transform-flow-strip-types',
-  ['@babel/plugin-proposal-class-properties', {loose: true}],
+  ['@babel/plugin-proposal-class-properties', { loose: true }],
   'syntax-trailing-function-commas',
   // These use loose mode which avoids embedding a runtime.
   // TODO: Remove object spread from the source. Prefer Object.assign instead.
   [
     '@babel/plugin-proposal-object-rest-spread',
-    {loose: true, useBuiltIns: true},
+    { loose: true, useBuiltIns: true },
   ],
-  ['@babel/plugin-transform-template-literals', {loose: true}],
+  ['@babel/plugin-transform-template-literals', { loose: true }],
   // TODO: Remove for...of from the source. It requires a runtime to be embedded.
   '@babel/plugin-transform-for-of',
   // TODO: Remove array spread from the source. Prefer .apply instead.
-  ['@babel/plugin-transform-spread', {loose: true, useBuiltIns: true}],
+  ['@babel/plugin-transform-spread', { loose: true, useBuiltIns: true }],
   '@babel/plugin-transform-parameters',
   // TODO: Remove array destructuring from the source. Requires runtime.
-  ['@babel/plugin-transform-destructuring', {loose: true, useBuiltIns: true}],
+  ['@babel/plugin-transform-destructuring', { loose: true, useBuiltIns: true }],
   // Transform Object spread to shared/assign
   require('../babel/transform-object-assign'),
 ];
@@ -127,7 +127,7 @@ const babelToES5Plugins = [
   '@babel/plugin-transform-block-scoped-functions',
   '@babel/plugin-transform-shorthand-properties',
   '@babel/plugin-transform-computed-properties',
-  ['@babel/plugin-transform-block-scoping', {throwIfClosureRequired: true}],
+  ['@babel/plugin-transform-block-scoping', { throwIfClosureRequired: true }],
 ];
 
 function getBabelConfig(
@@ -187,7 +187,10 @@ function getRollupOutputOptions(
     freeze: !isProduction,
     interop: false,
     name: globalName,
-    sourcemap: false,
+    sourcemap: true,
+    sourcemapPathTransform(relativeSourcePath, sourcemapPath) {
+      return relativeSourcePath.replace('../../../../packages', '/Users/zhouxihang/Desktop/my-projects/react/packages')
+    },
     esModule: false,
   };
 }
@@ -286,7 +289,7 @@ function forbidFBJSImports() {
       if (/^fbjs\//.test(importee)) {
         throw new Error(
           `Don't import ${importee} (found in ${importer}). ` +
-            `Use the utilities in packages/shared/ instead.`
+          `Use the utilities in packages/shared/ instead.`
         );
       }
     },
@@ -349,11 +352,11 @@ function getPlugins(
       )
     ),
     // Remove 'use strict' from individual source files.
-    {
-      transform(source) {
-        return source.replace(/['"]use strict["']/g, '');
-      },
-    },
+    // {
+    //   transform(source) {
+    //     return source.replace(/['"]use strict["']/g, '');
+    //   },
+    // },
     // Turn __DEV__ and process.env checks into constants.
     replace({
       __DEV__: isProduction ? 'false' : 'true',
@@ -367,49 +370,49 @@ function getPlugins(
     // Please don't enable this for anything else!
     isUMDBundle && entry === 'react-art' && commonjs(),
     // Apply dead code elimination and/or minification.
-    isProduction &&
-      closure({
-        compilation_level: 'SIMPLE',
-        language_in: 'ECMASCRIPT_2015',
-        language_out:
-          bundleType === BROWSER_SCRIPT ? 'ECMASCRIPT5' : 'ECMASCRIPT5_STRICT',
-        env: 'CUSTOM',
-        warning_level: 'QUIET',
-        apply_input_source_maps: false,
-        use_types_for_optimization: false,
-        process_common_js_modules: false,
-        rewrite_polyfills: false,
-        inject_libraries: false,
+    // isProduction &&
+    // closure({
+    //   compilation_level: 'SIMPLE',
+    //   language_in: 'ECMASCRIPT_2015',
+    //   language_out:
+    //     bundleType === BROWSER_SCRIPT ? 'ECMASCRIPT5' : 'ECMASCRIPT5_STRICT',
+    //   env: 'CUSTOM',
+    //   warning_level: 'QUIET',
+    //   apply_input_source_maps: false,
+    //   use_types_for_optimization: false,
+    //   process_common_js_modules: false,
+    //   rewrite_polyfills: false,
+    //   inject_libraries: false,
 
-        // Don't let it create global variables in the browser.
-        // https://github.com/facebook/react/issues/10909
-        assume_function_wrapper: !isUMDBundle,
-        renaming: !shouldStayReadable,
-      }),
+    //   // Don't let it create global variables in the browser.
+    //   // https://github.com/facebook/react/issues/10909
+    //   assume_function_wrapper: !isUMDBundle,
+    //   renaming: !shouldStayReadable,
+    // }),
     // HACK to work around the fact that Rollup isn't removing unused, pure-module imports.
     // Note that this plugin must be called after closure applies DCE.
-    isProduction && stripUnusedImports(pureExternalModules),
+    // isProduction && stripUnusedImports(pureExternalModules),
     // Add the whitespace back if necessary.
-    shouldStayReadable &&
-      prettier({
-        parser: 'babel',
-        singleQuote: false,
-        trailingComma: 'none',
-        bracketSpacing: true,
-      }),
+    // shouldStayReadable &&
+    // prettier({
+    //   parser: 'babel',
+    //   singleQuote: false,
+    //   trailingComma: 'none',
+    //   bracketSpacing: true,
+    // }),
     // License and haste headers, top-level `if` blocks.
-    {
-      renderChunk(source) {
-        return Wrappers.wrapBundle(
-          source,
-          bundleType,
-          globalName,
-          filename,
-          moduleType,
-          bundle.wrapWithModuleBoundaries
-        );
-      },
-    },
+    // {
+    //   renderChunk(source) {
+    //     return Wrappers.wrapBundle(
+    //       source,
+    //       bundleType,
+    //       globalName,
+    //       filename,
+    //       moduleType,
+    //       bundle.wrapWithModuleBoundaries
+    //     );
+    //   },
+    // },
     // Record bundle size.
     sizes({
       getSize: (size, gzip) => {
@@ -556,12 +559,12 @@ async function createBundle(bundle, bundleType) {
         if (id.indexOf('/src/') !== -1) {
           throw Error(
             'You are trying to import ' +
-              id +
-              ' but ' +
-              externals.find(containsThisModule) +
-              ' is one of npm dependencies, ' +
-              'so it will not contain that source file. You probably want ' +
-              'to create a new bundle entry point for it instead.'
+            id +
+            ' but ' +
+            externals.find(containsThisModule) +
+            ' is one of npm dependencies, ' +
+            'so it will not contain that source file. You probably want ' +
+            'to create a new bundle entry point for it instead.'
           );
         }
         return true;
@@ -648,10 +651,10 @@ function handleRollupWarning(warning) {
     if (typeof importSideEffects[externalModule] !== 'boolean') {
       throw new Error(
         'An external module "' +
-          externalModule +
-          '" is used in a DEV-only code path ' +
-          'but we do not know if it is safe to omit an unused require() to it in production. ' +
-          'Please add it to the `importSideEffects` list in `scripts/rollup/modules.js`.'
+        externalModule +
+        '" is used in a DEV-only code path ' +
+        'but we do not know if it is safe to omit an unused require() to it in production. ' +
+        'Please add it to the `importSideEffects` list in `scripts/rollup/modules.js`.'
       );
     }
     // Don't warn. We will remove side effectless require() in a later pass.
@@ -686,7 +689,7 @@ function handleRollupError(error) {
   );
   console.error(error.stack);
   if (error.loc && error.loc.file) {
-    const {file, line, column} = error.loc;
+    const { file, line, column } = error.loc;
     // This looks like an error from Rollup, e.g. missing export.
     // We'll use the accurate line numbers provided by Rollup but
     // use Babel code frame because it looks nicer.
