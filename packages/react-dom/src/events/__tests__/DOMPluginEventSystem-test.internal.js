@@ -1260,6 +1260,54 @@ describe('DOMPluginEventSystem', () => {
           }
         });
 
+        it.only('flushes continuous events in the capture phase of a discrete event', async () => {
+          const buttonRef = React.createRef();
+          function Test() {
+            const inputRef = React.useRef(null);
+            const [clientX, setClientX] = React.useState(0);
+            Scheduler.unstable_yieldValue('Test');
+            return (
+              <div>
+                <button
+                  ref={buttonRef}
+                  onClickCapture={() => {
+                    console.log('click!');
+                    Scheduler.unstable_yieldValue(clientX);
+                  }}
+                  onMouseOver={e => {
+                    console.log('on mouse over!');
+                    setClientX(e.clientX);
+                  }}
+                />
+              </div>
+            );
+          }
+          const root = ReactDOMClient.createRoot(container);
+          root.render(<Test />);
+          expect(Scheduler).toFlushAndYieldThrough(['Test']);
+          const buttonElement = buttonRef.current;
+
+          // Expect the click event to be able to get the latest state value set by mouse events
+          await act(async () => {
+            buttonElement.dispatchEvent(
+              new MouseEvent('mouseover', {
+                bubbles: true,
+                capture: true,
+                cancelable: true,
+                relatedTarget: null,
+                clientX: 5,
+              }),
+            );
+            dispatchClickEvent(buttonElement);
+          });
+          // TODO: This should be 5
+          expect(Scheduler).toHaveYielded([0, 'Test']);
+          await act(async () => {
+            dispatchClickEvent(buttonElement);
+          });
+          expect(Scheduler).toHaveYielded([5]);
+        });
+
         describe('ReactDOM.createEventHandle', () => {
           beforeEach(() => {
             jest.resetModules();
@@ -3254,5 +3302,5 @@ describe('DOMPluginEventSystem', () => {
   }
 
   withEnableLegacyFBSupport(false);
-  withEnableLegacyFBSupport(true);
+  // withEnableLegacyFBSupport(true);
 });

@@ -275,6 +275,7 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
     targetContainer,
     nativeEvent,
   );
+  console.log('blockedOn', blockedOn, domEventName);
   if (blockedOn === null) {
     dispatchEventForPluginEventSystem(
       domEventName,
