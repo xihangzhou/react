@@ -189,7 +189,7 @@ function getRollupOutputOptions(
     name: globalName,
     sourcemap: true,
     sourcemapPathTransform(relativeSourcePath, sourcemapPath) {
-      return relativeSourcePath.replace('../../../../packages', '/Users/zhouxihang/Desktop/my-projects/react/packages')
+      return relativeSourcePath.replace('../../../../packages', '/Users/zhouxihang/Desktop/open-source-projects/react/packages')
     },
     esModule: false,
   };
