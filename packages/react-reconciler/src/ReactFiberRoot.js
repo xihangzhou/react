@@ -7,18 +7,18 @@
  * @flow
  */
 
-import type {ReactNodeList} from 'shared/ReactTypes';
+import type { ReactNodeList } from 'shared/ReactTypes';
 import type {
   FiberRoot,
   SuspenseHydrationCallbacks,
   TransitionTracingCallbacks,
 } from './ReactInternalTypes';
-import type {RootTag} from './ReactRootTags';
-import type {Cache} from './ReactFiberCacheComponent';
-import type {Container} from './ReactFiberHostConfig';
+import type { RootTag } from './ReactRootTags';
+import type { Cache } from './ReactFiberCacheComponent';
+import type { Container } from './ReactFiberHostConfig';
 
-import {noTimeout, supportsHydration} from './ReactFiberHostConfig';
-import {createHostRootFiber} from './ReactFiber';
+import { noTimeout, supportsHydration } from './ReactFiberHostConfig';
+import { createHostRootFiber } from './ReactFiber';
 import {
   NoLane,
   NoLanes,
@@ -34,9 +34,9 @@ import {
   enableUpdaterTracking,
   enableTransitionTracing,
 } from 'shared/ReactFeatureFlags';
-import {initializeUpdateQueue} from './ReactFiberClassUpdateQueue';
-import {LegacyRoot, ConcurrentRoot} from './ReactRootTags';
-import {createCache, retainCache} from './ReactFiberCacheComponent';
+import { initializeUpdateQueue } from './ReactFiberClassUpdateQueue';
+import { LegacyRoot, ConcurrentRoot } from './ReactRootTags';
+import { createCache, retainCache } from './ReactFiberCacheComponent';
 
 export type RootState = {
   element: any,
@@ -145,32 +145,32 @@ export function createFiberRoot(
   transitionCallbacks: null | TransitionTracingCallbacks,
 ): FiberRoot {
   // $FlowFixMe[invalid-constructor] Flow no longer supports calling new on functions
-  const root: FiberRoot = (new FiberRootNode(
-    containerInfo,
-    tag,
+  const root: FiberRoot = (new FiberRootNode( // 通过new生成了一个fiberRoot实例，上面挂载了对应的方法，具体的属性之后用到了再看
+    containerInfo, // 绑定挂载的html元素
+    tag, // 0或者1，现在只有legacy root和concurrent root , ConcurrentRoot为1，默认开启所有的功能
     hydrate,
     identifierPrefix,
     onRecoverableError,
   ): any);
-  if (enableSuspenseCallback) {
+  if (enableSuspenseCallback) { // suspense相关暂时不管
     root.hydrationCallbacks = hydrationCallbacks;
   }
 
-  if (enableTransitionTracing) {
+  if (enableTransitionTracing) { // transition相关不管
     root.transitionCallbacks = transitionCallbacks;
   }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
-  const uninitializedFiber = createHostRootFiber(
+  const uninitializedFiber = createHostRootFiber( // 新建一个RootFiber(一颗fiber tree的根节点)也叫hostRootFiber
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
-  root.current = uninitializedFiber;
-  uninitializedFiber.stateNode = root;
+  root.current = uninitializedFiber; // fiberRoot的current属性指向这个fiber root根节点
+  uninitializedFiber.stateNode = root; // 把这个rootFiber的stateNode指向fiberRoot
 
-  if (enableCache) {
+  if (enableCache) {// 默认开启缓存
     const initialCache = createCache();
     retainCache(initialCache);
 
@@ -181,14 +181,14 @@ export function createFiberRoot(
     // component if rendering suspends. Because the lifetime of the pooled
     // cache is distinct from the main memoizedState.cache, it must be
     // retained separately.
-    root.pooledCache = initialCache;
-    retainCache(initialCache);
+    root.pooledCache = initialCache; // 把这个缓存池放在fiberroot的pooledCache上
+    retainCache(initialCache); // 暂时不管
     const initialState: RootState = {
-      element: initialChildren,
-      isDehydrated: hydrate,
+      element: initialChildren, // reactElement,即rootFiber上的reactElechildren
+      isDehydrated: hydrate, // 不管，不是ssr都是false
       cache: initialCache,
     };
-    uninitializedFiber.memoizedState = initialState;
+    uninitializedFiber.memoizedState = initialState; // 把initialState放在rootFiber的memoizedState中
   } else {
     const initialState: RootState = {
       element: initialChildren,

@@ -84,8 +84,8 @@
 // regardless of priority. Intermediate state may vary according to system
 // resources, but the final state is always the same.
 
-import type {Fiber, FiberRoot} from './ReactInternalTypes';
-import type {Lanes, Lane} from './ReactFiberLane';
+import type { Fiber, FiberRoot } from './ReactInternalTypes';
+import type { Lanes, Lane } from './ReactFiberLane';
 
 import {
   NoLane,
@@ -110,9 +110,9 @@ import {
 } from './ReactFiberFlags';
 import getComponentNameFromFiber from './getComponentNameFromFiber';
 
-import {debugRenderPhaseSideEffectsForStrictMode} from 'shared/ReactFeatureFlags';
+import { debugRenderPhaseSideEffectsForStrictMode } from 'shared/ReactFeatureFlags';
 
-import {StrictLegacyMode} from './ReactTypeOfMode';
+import { StrictLegacyMode } from './ReactTypeOfMode';
 import {
   markSkippedUpdateLanes,
   isUnsafeClassRenderPhaseUpdate,
@@ -122,7 +122,7 @@ import {
   enqueueConcurrentClassUpdate,
   unsafe_markUpdateLaneFromFiberToRoot,
 } from './ReactFiberConcurrentUpdates';
-import {setIsStrictModeForDevtools} from './ReactFiberDevToolsHook';
+import { setIsStrictModeForDevtools } from './ReactFiberDevToolsHook';
 
 import assign from 'shared/assign';
 
@@ -208,7 +208,7 @@ export function cloneUpdateQueue<State>(
   }
 }
 
-export function createUpdate(eventTime: number, lane: Lane): Update<mixed> {
+export function createUpdate(eventTime: number, lane: Lane): Update<mixed> {// 生成一个update对象
   const update: Update<mixed> = {
     eventTime,
     lane,
@@ -222,18 +222,18 @@ export function createUpdate(eventTime: number, lane: Lane): Update<mixed> {
   return update;
 }
 
-export function enqueueUpdate<State>(
-  fiber: Fiber,
-  update: Update<State>,
-  lane: Lane,
+export function enqueueUpdate<State>( // 把update对象入队等待更新,更新fiber上的lane
+  fiber: Fiber, // 入队更新的fiber节点
+  update: Update<State>, // 更新对象
+  lane: Lane, // 本次更新入队的优先级
 ): FiberRoot | null {
-  const updateQueue = fiber.updateQueue;
+  const updateQueue = fiber.updateQueue; // fiber上的updateQueue,和hook有关，存放了状态和回调等
   if (updateQueue === null) {
     // Only occurs if the fiber has been unmounted.
     return null;
   }
 
-  const sharedQueue: SharedQueue<State> = (updateQueue: any).shared;
+  const sharedQueue: SharedQueue<State> = (updateQueue: any).shared; //shared属性，猜测应该是所有hook的共享的属性
 
   if (__DEV__) {
     if (
@@ -243,16 +243,16 @@ export function enqueueUpdate<State>(
       const componentName = getComponentNameFromFiber(fiber);
       console.error(
         'An update (setState, replaceState, or forceUpdate) was scheduled ' +
-          'from inside an update function. Update functions should be pure, ' +
-          'with zero side-effects. Consider using componentDidUpdate or a ' +
-          'callback.\n\nPlease update the following component: %s',
+        'from inside an update function. Update functions should be pure, ' +
+        'with zero side-effects. Consider using componentDidUpdate or a ' +
+        'callback.\n\nPlease update the following component: %s',
         componentName,
       );
       didWarnUpdateInsideUpdate = true;
     }
   }
 
-  if (isUnsafeClassRenderPhaseUpdate(fiber)) {
+  if (isUnsafeClassRenderPhaseUpdate(fiber)) { // 不管
     // This is an unsafe render phase update. Add directly to the update
     // queue so we can process it immediately during the current render.
     const pending = sharedQueue.pending;
@@ -637,109 +637,109 @@ export function processUpdateQueue<State>(
           // Intentionally unsound. Pending updates form a circular list, but we
           // unravel them when transferring them to the base queue.
           const firstPendingUpdate = ((lastPendingUpdate.next: any): Update<State>);
-          lastPendingUpdate.next = null;
-          update = firstPendingUpdate;
-          queue.lastBaseUpdate = lastPendingUpdate;
-          queue.shared.pending = null;
+            lastPendingUpdate.next = null;
+            update = firstPendingUpdate;
+            queue.lastBaseUpdate = lastPendingUpdate;
+            queue.shared.pending = null;
         }
       }
     } while (true);
 
-    if (newLastBaseUpdate === null) {
-      newBaseState = newState;
+            if (newLastBaseUpdate === null) {
+              newBaseState = newState;
     }
 
-    queue.baseState = ((newBaseState: any): State);
-    queue.firstBaseUpdate = newFirstBaseUpdate;
-    queue.lastBaseUpdate = newLastBaseUpdate;
+            queue.baseState = ((newBaseState: any): State);
+            queue.firstBaseUpdate = newFirstBaseUpdate;
+            queue.lastBaseUpdate = newLastBaseUpdate;
 
-    if (firstBaseUpdate === null) {
-      // `queue.lanes` is used for entangling transitions. We can set it back to
-      // zero once the queue is empty.
-      queue.shared.lanes = NoLanes;
+            if (firstBaseUpdate === null) {
+              // `queue.lanes` is used for entangling transitions. We can set it back to
+              // zero once the queue is empty.
+              queue.shared.lanes = NoLanes;
     }
 
-    // Set the remaining expiration time to be whatever is remaining in the queue.
-    // This should be fine because the only two other things that contribute to
-    // expiration time are props and context. We're already in the middle of the
-    // begin phase by the time we start processing the queue, so we've already
-    // dealt with the props. Context in components that specify
-    // shouldComponentUpdate is tricky; but we'll have to account for
-    // that regardless.
-    markSkippedUpdateLanes(newLanes);
-    workInProgress.lanes = newLanes;
-    workInProgress.memoizedState = newState;
+            // Set the remaining expiration time to be whatever is remaining in the queue.
+            // This should be fine because the only two other things that contribute to
+            // expiration time are props and context. We're already in the middle of the
+            // begin phase by the time we start processing the queue, so we've already
+            // dealt with the props. Context in components that specify
+            // shouldComponentUpdate is tricky; but we'll have to account for
+            // that regardless.
+            markSkippedUpdateLanes(newLanes);
+            workInProgress.lanes = newLanes;
+            workInProgress.memoizedState = newState;
   }
 
-  if (__DEV__) {
-    currentlyProcessingQueue = null;
+            if (__DEV__) {
+              currentlyProcessingQueue = null;
   }
 }
 
-function callCallback(callback, context) {
+            function callCallback(callback, context) {
   if (typeof callback !== 'function') {
     throw new Error(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        `received: ${callback}`,
-    );
+            'Invalid argument passed as callback. Expected a function. Instead ' +
+            `received: ${callback}`,
+            );
   }
 
-  callback.call(context);
+            callback.call(context);
 }
 
-export function resetHasForceUpdateBeforeProcessing() {
-  hasForceUpdate = false;
+            export function resetHasForceUpdateBeforeProcessing() {
+              hasForceUpdate = false;
 }
 
-export function checkHasForceUpdateAfterProcessing(): boolean {
+            export function checkHasForceUpdateAfterProcessing(): boolean {
   return hasForceUpdate;
 }
 
-export function deferHiddenCallbacks<State>(
-  updateQueue: UpdateQueue<State>,
-): void {
+            export function deferHiddenCallbacks<State>(
+              updateQueue: UpdateQueue<State>,
+                ): void {
   // When an update finishes on a hidden component, its callback should not
   // be fired until/unless the component is made visible again. Stash the
   // callback on the shared queue object so it can be fired later.
   const newHiddenCallbacks = updateQueue.callbacks;
-  if (newHiddenCallbacks !== null) {
+                if (newHiddenCallbacks !== null) {
     const existingHiddenCallbacks = updateQueue.shared.hiddenCallbacks;
-    if (existingHiddenCallbacks === null) {
-      updateQueue.shared.hiddenCallbacks = newHiddenCallbacks;
+                if (existingHiddenCallbacks === null) {
+                  updateQueue.shared.hiddenCallbacks = newHiddenCallbacks;
     } else {
-      updateQueue.shared.hiddenCallbacks = existingHiddenCallbacks.concat(
-        newHiddenCallbacks,
-      );
+                  updateQueue.shared.hiddenCallbacks = existingHiddenCallbacks.concat(
+                    newHiddenCallbacks,
+                  );
     }
   }
 }
 
-export function commitHiddenCallbacks<State>(
-  updateQueue: UpdateQueue<State>,
-  context: any,
-): void {
+                export function commitHiddenCallbacks<State>(
+                  updateQueue: UpdateQueue<State>,
+                    context: any,
+                    ): void {
   // This component is switching from hidden -> visible. Commit any callbacks
   // that were previously deferred.
   const hiddenCallbacks = updateQueue.shared.hiddenCallbacks;
-  if (hiddenCallbacks !== null) {
-    updateQueue.shared.hiddenCallbacks = null;
-    for (let i = 0; i < hiddenCallbacks.length; i++) {
+                    if (hiddenCallbacks !== null) {
+                      updateQueue.shared.hiddenCallbacks = null;
+                    for (let i = 0; i < hiddenCallbacks.length; i++) {
       const callback = hiddenCallbacks[i];
-      callCallback(callback, context);
+                    callCallback(callback, context);
     }
   }
 }
 
-export function commitCallbacks<State>(
-  updateQueue: UpdateQueue<State>,
-  context: any,
-): void {
+                    export function commitCallbacks<State>(
+                      updateQueue: UpdateQueue<State>,
+                        context: any,
+                        ): void {
   const callbacks = updateQueue.callbacks;
-  if (callbacks !== null) {
-    updateQueue.callbacks = null;
-    for (let i = 0; i < callbacks.length; i++) {
+                        if (callbacks !== null) {
+                          updateQueue.callbacks = null;
+                        for (let i = 0; i < callbacks.length; i++) {
       const callback = callbacks[i];
-      callCallback(callback, context);
+                        callCallback(callback, context);
     }
   }
 }

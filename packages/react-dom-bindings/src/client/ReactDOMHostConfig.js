@@ -7,16 +7,16 @@
  * @flow
  */
 
-import type {EventPriority} from 'react-reconciler/src/ReactEventPriorities';
-import type {DOMEventName} from '../events/DOMEventNames';
-import type {Fiber, FiberRoot} from 'react-reconciler/src/ReactInternalTypes';
+import type { EventPriority } from 'react-reconciler/src/ReactEventPriorities';
+import type { DOMEventName } from '../events/DOMEventNames';
+import type { Fiber, FiberRoot } from 'react-reconciler/src/ReactInternalTypes';
 import type {
   BoundingRect,
   IntersectionObserverOptions,
   ObserveVisibleRectsCallback,
 } from 'react-reconciler/src/ReactTestSelectors';
-import type {ReactScopeInstance} from 'shared/ReactTypes';
-import type {AncestorInfoDev} from './validateDOMNesting';
+import type { ReactScopeInstance } from 'shared/ReactTypes';
+import type { AncestorInfoDev } from './validateDOMNesting';
 
 import {
   precacheFiberNode,
@@ -28,8 +28,8 @@ import {
   detachDeletedInstance,
   isMarkedResource,
 } from './ReactDOMComponentTree';
-export {detachDeletedInstance};
-import {hasRole} from './DOMAccessibilityRoles';
+export { detachDeletedInstance };
+import { hasRole } from './DOMAccessibilityRoles';
 import {
   createElement,
   createTextNode,
@@ -46,15 +46,15 @@ import {
   warnForInsertedHydratedText,
   getOwnerDocumentFromRootContainer,
 } from './ReactDOMComponent';
-import {getSelectionInformation, restoreSelection} from './ReactInputSelection';
+import { getSelectionInformation, restoreSelection } from './ReactInputSelection';
 import setTextContent from './setTextContent';
-import {validateDOMNesting, updatedAncestorInfoDev} from './validateDOMNesting';
+import { validateDOMNesting, updatedAncestorInfoDev } from './validateDOMNesting';
 import {
   isEnabled as ReactBrowserEventEmitterIsEnabled,
   setEnabled as ReactBrowserEventEmitterSetEnabled,
   getEventPriority,
 } from '../events/ReactDOMEventListener';
-import {getChildNamespace, SVG_NAMESPACE} from '../shared/DOMNamespaces';
+import { getChildNamespace, SVG_NAMESPACE } from '../shared/DOMNamespaces';
 import {
   ELEMENT_NODE,
   TEXT_NODE,
@@ -65,7 +65,7 @@ import {
 } from '../shared/HTMLNodeType';
 import dangerousStyleValue from '../shared/dangerousStyleValue';
 
-import {retryIfBlockedOn} from '../events/ReactDOMEventReplaying';
+import { retryIfBlockedOn } from '../events/ReactDOMEventReplaying';
 
 import {
   enableCreateEventHandleAPI,
@@ -79,19 +79,19 @@ import {
   HostText,
   HostSingleton,
 } from 'react-reconciler/src/ReactWorkTags';
-import {listenToAllSupportedEvents} from '../events/DOMPluginEventSystem';
+import { listenToAllSupportedEvents } from '../events/DOMPluginEventSystem';
 
-import {DefaultEventPriority} from 'react-reconciler/src/ReactEventPriorities';
+import { DefaultEventPriority } from 'react-reconciler/src/ReactEventPriorities';
 
 // TODO: Remove this deep import when we delete the legacy root API
-import {ConcurrentMode, NoMode} from 'react-reconciler/src/ReactTypeOfMode';
+import { ConcurrentMode, NoMode } from 'react-reconciler/src/ReactTypeOfMode';
 
 import {
   prepareToRenderResources,
   cleanupAfterRenderResources,
   clearRootResources,
 } from './ReactDOMFloatClient';
-import {validateLinkPropsForStyleResource} from '../shared/ReactDOMResourceValidation';
+import { validateLinkPropsForStyleResource } from '../shared/ReactDOMResourceValidation';
 
 export type Type = string;
 export type Props = {
@@ -101,7 +101,7 @@ export type Props = {
   hidden?: boolean,
   suppressHydrationWarning?: boolean,
   dangerouslySetInnerHTML?: mixed,
-  style?: {display?: string, ...},
+  style?: { display?: string, ... },
   bottom?: null | number,
   left?: null | number,
   right?: null | number,
@@ -128,9 +128,9 @@ export type EventTargetChildElement = {
   ...
 };
 export type Container =
-  | interface extends Element {_reactRootContainer?: FiberRoot}
-  | interface extends Document {_reactRootContainer?: FiberRoot}
-  | interface extends DocumentFragment {_reactRootContainer?: FiberRoot};
+  | interface extends Element { _reactRootContainer?: FiberRoot }
+  | interface extends Document { _reactRootContainer?: FiberRoot }
+  | interface extends DocumentFragment { _reactRootContainer?: FiberRoot };
 export type Instance = Element;
 export type TextInstance = Text;
 export interface SuspenseInstance extends Comment {
@@ -197,7 +197,7 @@ export function getRootHostContext(
   if (__DEV__) {
     const validatedTag = type.toLowerCase();
     const ancestorInfo = updatedAncestorInfoDev(null, validatedTag);
-    return {namespace, ancestorInfo};
+    return { namespace, ancestorInfo };
   }
   return namespace;
 }
@@ -213,7 +213,7 @@ export function getChildHostContext(
       parentHostContextDev.ancestorInfo,
       type,
     );
-    return {namespace, ancestorInfo};
+    return { namespace, ancestorInfo };
   }
   const parentNamespace = ((parentHostContext: any): HostContextProd);
   return getChildNamespace(parentNamespace, type);
@@ -380,7 +380,7 @@ export function createTextInstance(
   return textNode;
 }
 
-export function getCurrentEventPriority(): EventPriority {
+export function getCurrentEventPriority(): EventPriority { // 根据window.event这个全局挂载的对象事件来判断当前的事件优先级
   const currentEvent = window.event;
   if (currentEvent === undefined) {
     return DefaultEventPriority;
@@ -438,12 +438,12 @@ export const scheduleMicrotask: any =
   typeof queueMicrotask === 'function'
     ? queueMicrotask
     : typeof localPromise !== 'undefined'
-    ? callback =>
+      ? callback =>
         localPromise
           .resolve(null)
           .then(callback)
           .catch(handleErrorInNextTick)
-    : scheduleTimeout; // TODO: Determine the best fallback here.
+      : scheduleTimeout; // TODO: Determine the best fallback here.
 
 function handleErrorInNextTick(error) {
   setTimeout(() => {
@@ -701,8 +701,8 @@ export function unhideInstance(instance: Instance, props: Props): void {
   const styleProp = props[STYLE];
   const display =
     styleProp !== undefined &&
-    styleProp !== null &&
-    styleProp.hasOwnProperty('display')
+      styleProp !== null &&
+      styleProp.hasOwnProperty('display')
       ? styleProp.display
       : null;
   instance.style.display = dangerousStyleValue('display', display);
@@ -816,13 +816,13 @@ export function isHydratable(type: string, props: Props): boolean {
     if (type === 'link') {
       if (
         (props: any).rel === 'stylesheet' &&
-        typeof (props: any).precedence !== 'string'
+          typeof (props: any).precedence !== 'string'
       ) {
         return true;
       }
       return false;
     } else if (type === 'script') {
-      const {async, onLoad, onError} = (props: any);
+      const { async, onLoad, onError } = (props: any);
       return !(async && (onLoad || onError));
     }
     return true;
@@ -881,7 +881,7 @@ export function isSuspenseInstanceFallback(
 
 export function getSuspenseInstanceFallbackErrorDetails(
   instance: SuspenseInstance,
-): {digest: ?string, message?: string, stack?: string} {
+): { digest: ?string, message?: string, stack?: string } {
   const dataset =
     instance.nextSibling && ((instance.nextSibling: any): HTMLElement).dataset;
   let digest, message, stack;
@@ -1519,7 +1519,7 @@ export function setupIntersectionObserver(
 
   const handleIntersection = (entries: Array<IntersectionObserverEntry>) => {
     entries.forEach(entry => {
-      const {boundingClientRect, intersectionRatio, target} = entry;
+      const { boundingClientRect, intersectionRatio, target } = entry;
       rectRatioCache.set(target, {
         rect: {
           x: boundingClientRect.left,
@@ -1592,19 +1592,19 @@ export function isHostResourceType(
       return namespace !== SVG_NAMESPACE;
     }
     case 'link': {
-      const {onLoad, onError} = props;
+      const { onLoad, onError } = props;
       if (onLoad || onError) {
         if (__DEV__) {
           if (outsideHostContainerContext) {
             console.error(
               'Cannot render a <link> with onLoad or onError listeners outside the main document.' +
-                ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
-                ' somewhere in the <body>.',
+              ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
+              ' somewhere in the <body>.',
             );
           } else if (namespace === SVG_NAMESPACE) {
             console.error(
               'Cannot render a <link> with onLoad or onError listeners as a descendent of <svg>.' +
-                ' Try removing onLoad={...} and onError={...} or moving it above the <svg> ancestor.',
+              ' Try removing onLoad={...} and onError={...} or moving it above the <svg> ancestor.',
             );
           }
         }
@@ -1612,19 +1612,19 @@ export function isHostResourceType(
       }
       switch (props.rel) {
         case 'stylesheet': {
-          const {href, precedence, disabled} = props;
+          const { href, precedence, disabled } = props;
           if (__DEV__) {
             validateLinkPropsForStyleResource(props);
             if (typeof precedence !== 'string') {
               if (outsideHostContainerContext) {
                 console.error(
                   'Cannot render a <link rel="stylesheet" /> outside the main document without knowing its precedence.' +
-                    ' Consider adding precedence="default" or moving it into the root <head> tag.',
+                  ' Consider adding precedence="default" or moving it into the root <head> tag.',
                 );
               } else if (namespace === SVG_NAMESPACE) {
                 console.error(
                   'Cannot render a <link rel="stylesheet" /> as a descendent of an <svg> element without knowing its precedence.' +
-                    ' Consider adding precedence="default" or moving it above the <svg> ancestor.',
+                  ' Consider adding precedence="default" or moving it above the <svg> ancestor.',
                 );
               }
             }
@@ -1636,7 +1636,7 @@ export function isHostResourceType(
           );
         }
         default: {
-          const {rel, href} = props;
+          const { rel, href } = props;
           return typeof href === 'string' && typeof rel === 'string';
         }
       }
@@ -1644,31 +1644,31 @@ export function isHostResourceType(
     case 'script': {
       // We don't validate because it is valid to use async with onLoad/onError unlike combining
       // precedence with these for style resources
-      const {src, async, onLoad, onError} = props;
+      const { src, async, onLoad, onError } = props;
       if (__DEV__) {
         if (async !== true) {
           if (outsideHostContainerContext) {
             console.error(
               'Cannot render a sync or defer <script> outside the main document without knowing its order.' +
-                ' Try adding async="" or moving it into the root <head> tag.',
+              ' Try adding async="" or moving it into the root <head> tag.',
             );
           } else if (namespace === SVG_NAMESPACE) {
             console.error(
               'Cannot render a sync or defer <script> as a descendent of an <svg> element.' +
-                ' Try adding async="" or moving it above the ancestor <svg> element.',
+              ' Try adding async="" or moving it above the ancestor <svg> element.',
             );
           }
         } else if (onLoad || onError) {
           if (outsideHostContainerContext) {
             console.error(
               'Cannot render a <script> with onLoad or onError listeners outside the main document.' +
-                ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
-                ' somewhere in the <body>.',
+              ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
+              ' somewhere in the <body>.',
             );
           } else if (namespace === SVG_NAMESPACE) {
             console.error(
               'Cannot render a <script> with onLoad or onError listeners as a descendent of an <svg> element.' +
-                ' Try removing onLoad={...} and onError={...} or moving it above the ancestor <svg> element.',
+              ' Try removing onLoad={...} and onError={...} or moving it above the ancestor <svg> element.',
             );
           }
         }
@@ -1742,8 +1742,8 @@ export function resolveSingletonInstance(
       if (!documentElement) {
         throw new Error(
           'React expected an <html> element (document.documentElement) to exist in the Document but one was' +
-            ' not found. React never removes the documentElement for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          ' not found. React never removes the documentElement for any Document it renders into so' +
+          ' the cause is likely in some other script running on this page.',
         );
       }
       return documentElement;
@@ -1753,8 +1753,8 @@ export function resolveSingletonInstance(
       if (!head) {
         throw new Error(
           'React expected a <head> element (document.head) to exist in the Document but one was' +
-            ' not found. React never removes the head for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          ' not found. React never removes the head for any Document it renders into so' +
+          ' the cause is likely in some other script running on this page.',
         );
       }
       return head;
@@ -1764,8 +1764,8 @@ export function resolveSingletonInstance(
       if (!body) {
         throw new Error(
           'React expected a <body> element (document.body) to exist in the Document but one was' +
-            ' not found. React never removes the body for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          ' not found. React never removes the body for any Document it renders into so' +
+          ' the cause is likely in some other script running on this page.',
         );
       }
       return body;
@@ -1790,9 +1790,9 @@ export function acquireSingletonInstance(
       const tagName = instance.tagName.toLowerCase();
       console.error(
         'You are mounting a new %s component when a previous one has not first unmounted. It is an' +
-          ' error to render more than one %s component at a time and attributes and children of these' +
-          ' components will likely fail in unpredictable ways. Please only render a single instance of' +
-          ' <%s> and if you need to mount a new one, ensure any previous ones have unmounted first.',
+        ' error to render more than one %s component at a time and attributes and children of these' +
+        ' components will likely fail in unpredictable ways. Please only render a single instance of' +
+        ' <%s> and if you need to mount a new one, ensure any previous ones have unmounted first.',
         tagName,
         tagName,
         tagName,

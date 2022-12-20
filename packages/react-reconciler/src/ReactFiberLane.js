@@ -7,9 +7,9 @@
  * @flow
  */
 
-import type {Fiber, FiberRoot} from './ReactInternalTypes';
-import type {Transition} from './ReactFiberTracingMarkerComponent';
-import type {ConcurrentUpdate} from './ReactFiberConcurrentUpdates';
+import type { Fiber, FiberRoot } from './ReactInternalTypes';
+import type { Transition } from './ReactFiberTracingMarkerComponent';
+import type { ConcurrentUpdate } from './ReactFiberConcurrentUpdates';
 
 // TODO: Ideally these types would be opaque but that doesn't work well with
 // our reconciler fork infra, since these leak into non-reconciler packages.
@@ -24,9 +24,9 @@ import {
   allowConcurrentByDefault,
   enableTransitionTracing,
 } from 'shared/ReactFeatureFlags';
-import {isDevToolsPresent} from './ReactFiberDevToolsHook';
-import {ConcurrentUpdatesByDefaultMode, NoMode} from './ReactTypeOfMode';
-import {clz32} from './clz32';
+import { isDevToolsPresent } from './ReactFiberDevToolsHook';
+import { ConcurrentUpdatesByDefaultMode, NoMode } from './ReactTypeOfMode';
+import { clz32 } from './clz32';
 
 // Lane values below should be kept in sync with getLabelForLane(), used by react-devtools-timeline.
 // If those values are changed that package should be rebuilt and redeployed.
@@ -541,7 +541,7 @@ export function pickArbitraryLane(lanes: Lanes): Lane {
   return getHighestPriorityLane(lanes);
 }
 
-function pickArbitraryLaneIndex(lanes: Lanes) {
+function pickArbitraryLaneIndex(lanes: Lanes) { // 传入一个lanes，返回从第一个不为0开始的长度
   return 31 - clz32(lanes);
 }
 
@@ -595,7 +595,7 @@ export function markRootUpdated(
   updateLane: Lane,
   eventTime: number,
 ) {
-  root.pendingLanes |= updateLane;
+  root.pendingLanes |= updateLane; // 更新优先级加入fiberRoot的pendingLanes，注意是通过|的关系。意味着pendingLanes存放的是fiberRoot中所有存在的优先级
 
   // If there are any suspended transitions, it's possible this new update
   // could unblock them. Clear the suspended lanes so that we can try rendering
@@ -609,16 +609,16 @@ export function markRootUpdated(
   // We don't do this if the incoming update is idle, because we never process
   // idle updates until after all the regular updates have finished; there's no
   // way it could unblock a transition.
-  if (updateLane !== IdleLane) {
+  if (updateLane !== IdleLane) { // 下面两个lanes先不管
     root.suspendedLanes = NoLanes;
     root.pingedLanes = NoLanes;
   }
 
   const eventTimes = root.eventTimes;
-  const index = laneToIndex(updateLane);
+  const index = laneToIndex(updateLane); // 把一个优先级转换成一个唯一对应的下标
   // We can always overwrite an existing timestamp because we prefer the most
   // recent event, and we assume time is monotonically increasing.
-  eventTimes[index] = eventTime;
+  eventTimes[index] = eventTime; // 更新这个优先级在这个fiberRoot上的最新的eventTime
 }
 
 export function markRootSuspended(root: FiberRoot, suspendedLanes: Lanes) {

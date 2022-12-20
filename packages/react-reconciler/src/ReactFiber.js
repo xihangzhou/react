@@ -7,19 +7,19 @@
  * @flow
  */
 
-import type {ReactElement} from 'shared/ReactElementType';
-import type {ReactFragment, ReactPortal, ReactScope} from 'shared/ReactTypes';
-import type {Fiber} from './ReactInternalTypes';
-import type {RootTag} from './ReactRootTags';
-import type {WorkTag} from './ReactWorkTags';
-import type {TypeOfMode} from './ReactTypeOfMode';
-import type {Lanes} from './ReactFiberLane';
-import type {SuspenseInstance} from './ReactFiberHostConfig';
+import type { ReactElement } from 'shared/ReactElementType';
+import type { ReactFragment, ReactPortal, ReactScope } from 'shared/ReactTypes';
+import type { Fiber } from './ReactInternalTypes';
+import type { RootTag } from './ReactRootTags';
+import type { WorkTag } from './ReactWorkTags';
+import type { TypeOfMode } from './ReactTypeOfMode';
+import type { Lanes } from './ReactFiberLane';
+import type { SuspenseInstance } from './ReactFiberHostConfig';
 import type {
   OffscreenProps,
   OffscreenInstance,
 } from './ReactFiberOffscreenComponent';
-import type {TracingMarkerInstance} from './ReactFiberTracingMarkerComponent';
+import type { TracingMarkerInstance } from './ReactFiberTracingMarkerComponent';
 
 import {
   supportsResources,
@@ -40,8 +40,8 @@ import {
   enableFloat,
   enableHostSingletons,
 } from 'shared/ReactFeatureFlags';
-import {NoFlags, Placement, StaticMask} from './ReactFiberFlags';
-import {ConcurrentRoot} from './ReactRootTags';
+import { NoFlags, Placement, StaticMask } from './ReactFiberFlags';
+import { ConcurrentRoot } from './ReactRootTags';
 import {
   IndeterminateComponent,
   ClassComponent,
@@ -70,15 +70,15 @@ import {
   CacheComponent,
   TracingMarkerComponent,
 } from './ReactWorkTags';
-import {OffscreenVisible} from './ReactFiberOffscreenComponent';
+import { OffscreenVisible } from './ReactFiberOffscreenComponent';
 import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
-import {isDevToolsPresent} from './ReactFiberDevToolsHook';
+import { isDevToolsPresent } from './ReactFiberDevToolsHook';
 import {
   resolveClassForHotReloading,
   resolveFunctionForHotReloading,
   resolveForwardRefForHotReloading,
 } from './ReactFiberHotReloading';
-import {NoLanes} from './ReactFiberLane';
+import { NoLanes } from './ReactFiberLane';
 import {
   NoMode,
   ConcurrentMode,
@@ -106,14 +106,14 @@ import {
   REACT_CACHE_TYPE,
   REACT_TRACING_MARKER_TYPE,
 } from 'shared/ReactSymbols';
-import {TransitionTracingMarker} from './ReactFiberTracingMarkerComponent';
+import { TransitionTracingMarker } from './ReactFiberTracingMarkerComponent';
 import {
   detachOffscreenInstance,
   attachOffscreenInstance,
 } from './ReactFiberCommitWork';
-import {getHostContext} from './ReactFiberHostContext';
+import { getHostContext } from './ReactFiberHostContext';
 
-export type {Fiber};
+export type { Fiber };
 
 let hasBadMapPolyfill;
 
@@ -224,14 +224,14 @@ function FiberNode(
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
-const createFiber = function(
-  tag: WorkTag,
-  pendingProps: mixed,
-  key: null | string,
-  mode: TypeOfMode,
+const createFiber = function ( // 生成一个fiber节点的函数
+  tag: WorkTag, // 代表这个节点是什么类型的，比如是函数节点？一颗fiber tree根节点？
+  pendingProps: mixed, // 暂时不知道，在创建rootFiber的时候为null
+  key: null | string, // key属性
+  mode: TypeOfMode, // concurrent还是legacy模式
 ): Fiber {
   // $FlowFixMe: the shapes are exact here but Flow doesn't like constructors
-  return new FiberNode(tag, pendingProps, key, mode);
+  return new FiberNode(tag, pendingProps, key, mode); // 调用FiberNode构造函数，绑定初始化各种属性
 };
 
 function shouldConstruct(Component: Function) {
@@ -332,9 +332,9 @@ export function createWorkInProgress(current: Fiber, pendingProps: any): Fiber {
     currentDependencies === null
       ? null
       : {
-          lanes: currentDependencies.lanes,
-          firstContext: currentDependencies.firstContext,
-        };
+        lanes: currentDependencies.lanes,
+        firstContext: currentDependencies.firstContext,
+      };
 
   // These will be overridden during the parent's reconciliation
   workInProgress.sibling = current.sibling;
@@ -431,9 +431,9 @@ export function resetWorkInProgress(
       currentDependencies === null
         ? null
         : {
-            lanes: currentDependencies.lanes,
-            firstContext: currentDependencies.firstContext,
-          };
+          lanes: currentDependencies.lanes,
+          firstContext: currentDependencies.firstContext,
+        };
 
     if (enableProfilerTimer) {
       // Note: We don't reset the actualTime counts. It's useful to accumulate
@@ -453,7 +453,7 @@ export function createHostRootFiber(
 ): Fiber {
   let mode;
   if (tag === ConcurrentRoot) {
-    mode = ConcurrentMode;
+    mode = ConcurrentMode; // 如果tag为concurrent, mode也为concurrent，只需要知道这个即可，后面的暂时不用管
     if (isStrictMode === true || createRootStrictEffectsByDefault) {
       mode |= StrictLegacyMode | StrictEffectsMode;
     }
@@ -513,8 +513,8 @@ export function createFiberFromTypeAndProps(
       fiberTag = isHostResourceType(type, pendingProps, hostContext)
         ? HostResource
         : isHostSingletonType(type)
-        ? HostSingleton
-        : HostComponent;
+          ? HostSingleton
+          : HostComponent;
     } else if (enableFloat && supportsResources) {
       const hostContext = getHostContext();
       fiberTag = isHostResourceType(type, pendingProps, hostContext)
@@ -618,8 +618,8 @@ export function createFiberFromTypeAndProps(
 
         throw new Error(
           'Element type is invalid: expected a string (for built-in ' +
-            'components) or a class/function (for composite components) ' +
-            `but got: ${type == null ? type : typeof type}.${info}`,
+          'components) or a class/function (for composite components) ' +
+          `but got: ${type == null ? type : typeof type}.${info}`,
         );
       }
     }

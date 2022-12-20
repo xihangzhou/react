@@ -7,12 +7,12 @@
  * @flow
  */
 
-import type {EventPriority} from 'react-reconciler/src/ReactEventPriorities';
-import type {AnyNativeEvent} from '../events/PluginModuleType';
-import type {Fiber, FiberRoot} from 'react-reconciler/src/ReactInternalTypes';
-import type {Container, SuspenseInstance} from '../client/ReactDOMHostConfig';
-import type {DOMEventName} from '../events/DOMEventNames';
-import {enableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay} from 'shared/ReactFeatureFlags';
+import type { EventPriority } from 'react-reconciler/src/ReactEventPriorities';
+import type { AnyNativeEvent } from '../events/PluginModuleType';
+import type { Fiber, FiberRoot } from 'react-reconciler/src/ReactInternalTypes';
+import type { Container, SuspenseInstance } from '../client/ReactDOMHostConfig';
+import type { DOMEventName } from '../events/DOMEventNames';
+import { enableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay } from 'shared/ReactFeatureFlags';
 import {
   isDiscreteEventThatRequiresHydration,
   queueDiscreteEvent,
@@ -26,8 +26,8 @@ import {
   getContainerFromFiber,
   getSuspenseInstanceFromFiber,
 } from 'react-reconciler/src/ReactFiberTreeReflection';
-import {HostRoot, SuspenseComponent} from 'react-reconciler/src/ReactWorkTags';
-import {type EventSystemFlags, IS_CAPTURE_PHASE} from './EventSystemFlags';
+import { HostRoot, SuspenseComponent } from 'react-reconciler/src/ReactWorkTags';
+import { type EventSystemFlags, IS_CAPTURE_PHASE } from './EventSystemFlags';
 
 import getEventTarget from './getEventTarget';
 import {
@@ -35,7 +35,7 @@ import {
   getClosestInstanceFromNode,
 } from '../client/ReactDOMComponentTree';
 
-import {dispatchEventForPluginEventSystem} from './DOMPluginEventSystem';
+import { dispatchEventForPluginEventSystem } from './DOMPluginEventSystem';
 
 import {
   getCurrentPriorityLevel as getCurrentSchedulerPriorityLevel,
@@ -54,9 +54,9 @@ import {
   setCurrentUpdatePriority,
 } from 'react-reconciler/src/ReactEventPriorities';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {isRootDehydrated} from 'react-reconciler/src/ReactFiberShellHydration';
+import { isRootDehydrated } from 'react-reconciler/src/ReactFiberShellHydration';
 
-const {ReactCurrentBatchConfig} = ReactSharedInternals;
+const { ReactCurrentBatchConfig } = ReactSharedInternals;
 
 // TODO: can we stop exporting these?
 export let _enabled: boolean = true;
@@ -408,7 +408,7 @@ export function findInstanceBlockingEvent(
   return null;
 }
 
-export function getEventPriority(domEventName: DOMEventName): EventPriority {
+export function getEventPriority(domEventName: DOMEventName): EventPriority {// 不同的原生事件对应不同的事件优先级
   switch (domEventName) {
     // Used by SimpleEventPlugin:
     case 'cancel':

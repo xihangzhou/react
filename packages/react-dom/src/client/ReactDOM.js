@@ -7,7 +7,7 @@
  * @flow
  */
 
-import type {ReactNodeList} from 'shared/ReactTypes';
+import type { ReactNodeList } from 'shared/ReactTypes';
 import type {
   Container,
   PublicInstance,
@@ -30,7 +30,7 @@ import {
   hydrateRoot as hydrateRootImpl,
   isValidContainer,
 } from './ReactDOMRoot';
-import {createEventHandle} from 'react-dom-bindings/src/client/ReactDOMEventHandle';
+import { createEventHandle } from 'react-dom-bindings/src/client/ReactDOMEventHandle';
 
 import {
   batchedUpdates,
@@ -48,8 +48,8 @@ import {
   runWithPriority,
   getCurrentUpdatePriority,
 } from 'react-reconciler/src/ReactEventPriorities';
-import {createPortal as createPortalImpl} from 'react-reconciler/src/ReactPortal';
-import {canUseDOM} from 'shared/ExecutionEnvironment';
+import { createPortal as createPortalImpl } from 'react-reconciler/src/ReactPortal';
+import { canUseDOM } from 'shared/ExecutionEnvironment';
 import ReactVersion from 'shared/ReactVersion';
 
 import {
@@ -58,7 +58,7 @@ import {
   getNodeFromInstance,
   getFiberCurrentPropsFromNode,
 } from 'react-dom-bindings/src/client/ReactDOMComponentTree';
-import {restoreControlledState} from 'react-dom-bindings/src/client/ReactDOMComponent';
+import { restoreControlledState } from 'react-dom-bindings/src/client/ReactDOMComponent';
 import {
   setAttemptSynchronousHydration,
   setAttemptDiscreteHydration,
@@ -67,7 +67,7 @@ import {
   setGetCurrentUpdatePriority,
   setAttemptHydrationAtPriority,
 } from 'react-dom-bindings/src/events/ReactDOMEventReplaying';
-import {setBatchingImplementation} from 'react-dom-bindings/src/events/ReactDOMUpdateBatching';
+import { setBatchingImplementation } from 'react-dom-bindings/src/events/ReactDOMUpdateBatching';
 import {
   setRestoreImplementation,
   enqueueStateRestore,
@@ -75,7 +75,7 @@ import {
 } from 'react-dom-bindings/src/events/ReactDOMControlledComponent';
 import Internals from '../ReactDOMSharedInternals';
 
-export {preinit, preload} from 'react-dom-bindings/src/shared/ReactDOMFloat';
+export { preinit, preload } from 'react-dom-bindings/src/shared/ReactDOMFloat';
 
 setAttemptSynchronousHydration(attemptSynchronousHydration);
 setAttemptDiscreteHydration(attemptDiscreteHydration);
@@ -98,7 +98,7 @@ if (__DEV__) {
   ) {
     console.error(
       'React depends on Map and Set built-in types. Make sure that you load a ' +
-        'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
+      'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
     );
   }
 }
@@ -138,15 +138,15 @@ function renderSubtreeIntoContainer(
   );
 }
 
-function createRoot(
+function createRoot( // 给外部调用，作用是返回一个ReactDOMRoot，这个实例的_internalRoot指向fiberRoot,render方法在ReactDOMRoot的原型上
   container: Element | Document | DocumentFragment,
   options?: CreateRootOptions,
 ): RootType {
-  if (__DEV__) {
+  if (__DEV__) { // 所有的_DEV__的代码不管
     if (!Internals.usingClientEntryPoint && !__UMD__) {
       console.error(
         'You are importing createRoot from "react-dom" which is not supported. ' +
-          'You should instead import it from "react-dom/client".',
+        'You should instead import it from "react-dom/client".',
       );
     }
   }
@@ -162,7 +162,7 @@ function hydrateRoot(
     if (!Internals.usingClientEntryPoint && !__UMD__) {
       console.error(
         'You are importing hydrateRoot from "react-dom" which is not supported. ' +
-          'You should instead import it from "react-dom/client".',
+        'You should instead import it from "react-dom/client".',
       );
     }
   }
@@ -180,8 +180,8 @@ function flushSync<R>(fn: (() => R) | void): R | void {
     if (isAlreadyRendering()) {
       console.error(
         'flushSync was called from inside a lifecycle method. React cannot ' +
-          'flush when React is already rendering. Consider moving this call to ' +
-          'a scheduler task or micro task.',
+        'flush when React is already rendering. Consider moving this call to ' +
+        'a scheduler task or micro task.',
       );
     }
   }
@@ -243,12 +243,12 @@ if (__DEV__) {
         // eslint-disable-next-line react-internal/no-production-logging
         console.info(
           '%cDownload the React DevTools ' +
-            'for a better development experience: ' +
-            'https://reactjs.org/link/react-devtools' +
-            (protocol === 'file:'
-              ? '\nYou might need to use a local HTTP server (instead of file://): ' +
-                'https://reactjs.org/link/react-devtools-faq'
-              : ''),
+          'for a better development experience: ' +
+          'https://reactjs.org/link/react-devtools' +
+          (protocol === 'file:'
+            ? '\nYou might need to use a local HTTP server (instead of file://): ' +
+            'https://reactjs.org/link/react-devtools-faq'
+            : ''),
           'font-weight:bold',
         );
       }

@@ -13,7 +13,7 @@ import type {
   SuspenseHydrationCallbacks,
   TransitionTracingCallbacks,
 } from './ReactInternalTypes';
-import type {RootTag} from './ReactRootTags';
+import type { RootTag } from './ReactRootTags';
 import type {
   Instance,
   TextInstance,
@@ -21,15 +21,15 @@ import type {
   PublicInstance,
   RendererInspectionConfig,
 } from './ReactFiberHostConfig';
-import type {ReactNodeList} from 'shared/ReactTypes';
-import type {Lane} from './ReactFiberLane';
-import type {SuspenseState} from './ReactFiberSuspenseComponent';
+import type { ReactNodeList } from 'shared/ReactTypes';
+import type { Lane } from './ReactFiberLane';
+import type { SuspenseState } from './ReactFiberSuspenseComponent';
 
 import {
   findCurrentHostFiber,
   findCurrentHostFiberWithNoPortals,
 } from './ReactFiberTreeReflection';
-import {get as getInstance} from 'shared/ReactInstanceMap';
+import { get as getInstance } from 'shared/ReactInstanceMap';
 import {
   HostComponent,
   HostSingleton,
@@ -39,17 +39,17 @@ import {
 } from './ReactWorkTags';
 import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
 import isArray from 'shared/isArray';
-import {enableSchedulingProfiler} from 'shared/ReactFeatureFlags';
+import { enableSchedulingProfiler } from 'shared/ReactFeatureFlags';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {getPublicInstance} from './ReactFiberHostConfig';
+import { getPublicInstance } from './ReactFiberHostConfig';
 import {
   findCurrentUnmaskedContext,
   processChildContext,
   emptyContextObject,
   isContextProvider as isLegacyContextProvider,
 } from './ReactFiberContext';
-import {createFiberRoot} from './ReactFiberRoot';
-import {isRootDehydrated} from './ReactFiberShellHydration';
+import { createFiberRoot } from './ReactFiberRoot';
+import { isRootDehydrated } from './ReactFiberShellHydration';
 import {
   injectInternals,
   markRenderScheduled,
@@ -69,7 +69,7 @@ import {
   discreteUpdates,
   flushPassiveEffects,
 } from './ReactFiberWorkLoop';
-import {enqueueConcurrentRenderForLane} from './ReactFiberConcurrentUpdates';
+import { enqueueConcurrentRenderForLane } from './ReactFiberConcurrentUpdates';
 import {
   createUpdate,
   enqueueUpdate,
@@ -81,7 +81,7 @@ import {
   resetCurrentFiber as resetCurrentDebugFiberInDEV,
   setCurrentFiber as setCurrentDebugFiberInDEV,
 } from './ReactCurrentFiber';
-import {StrictLegacyMode} from './ReactTypeOfMode';
+import { StrictLegacyMode } from './ReactTypeOfMode';
 import {
   SyncLane,
   SelectiveHydrationLane,
@@ -100,8 +100,8 @@ import {
   findHostInstancesForRefresh,
 } from './ReactFiberHotReloading';
 import ReactVersion from 'shared/ReactVersion';
-export {registerMutableSourceForHydration} from './ReactMutableSource';
-export {createPortal} from './ReactPortal';
+export { registerMutableSourceForHydration } from './ReactMutableSource';
+export { createPortal } from './ReactPortal';
 export {
   createComponentSelector,
   createHasPseudoClassSelector,
@@ -142,11 +142,11 @@ if (__DEV__) {
 function getContextForSubtree(
   parentComponent: ?React$Component<any, any>,
 ): Object {
-  if (!parentComponent) {
+  if (!parentComponent) { // 没有父reactEle返回空{}
     return emptyContextObject;
   }
 
-  const fiber = getInstance(parentComponent);
+  const fiber = getInstance(parentComponent); // g=
   const parentContext = findCurrentUnmaskedContext(fiber);
 
   if (fiber.tag === ClassComponent) {
@@ -209,10 +209,10 @@ function findHostInstanceWithWarning(
           if (fiber.mode & StrictLegacyMode) {
             console.error(
               '%s is deprecated in StrictMode. ' +
-                '%s was passed an instance of %s which is inside StrictMode. ' +
-                'Instead, add a ref directly to the element you want to reference. ' +
-                'Learn more about using refs safely here: ' +
-                'https://reactjs.org/link/strict-mode-find-node',
+              '%s was passed an instance of %s which is inside StrictMode. ' +
+              'Instead, add a ref directly to the element you want to reference. ' +
+              'Learn more about using refs safely here: ' +
+              'https://reactjs.org/link/strict-mode-find-node',
               methodName,
               methodName,
               componentName,
@@ -220,10 +220,10 @@ function findHostInstanceWithWarning(
           } else {
             console.error(
               '%s is deprecated in StrictMode. ' +
-                '%s was passed an instance of %s which renders StrictMode children. ' +
-                'Instead, add a ref directly to the element you want to reference. ' +
-                'Learn more about using refs safely here: ' +
-                'https://reactjs.org/link/strict-mode-find-node',
+              '%s was passed an instance of %s which renders StrictMode children. ' +
+              'Instead, add a ref directly to the element you want to reference. ' +
+              'Learn more about using refs safely here: ' +
+              'https://reactjs.org/link/strict-mode-find-node',
               methodName,
               methodName,
               componentName,
@@ -245,7 +245,7 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
-export function createContainer(
+export function createContainer( // 实际调用createfiberoot返回fiberrrot
   containerInfo: Container,
   tag: RootTag,
   hydrationCallbacks: null | SuspenseHydrationCallbacks,
@@ -257,7 +257,7 @@ export function createContainer(
 ): OpaqueRoot {
   const hydrate = false;
   const initialChildren = null;
-  return createFiberRoot(
+  return createFiberRoot( // 创建fiberroot
     containerInfo,
     tag,
     hydrate,
@@ -319,9 +319,9 @@ export function createHydrationContainer(
   return root;
 }
 
-export function updateContainer(
-  element: ReactNodeList,
-  container: OpaqueRoot,
+export function updateContainer( // 传入本次更新的fiberRoot,以及新的reacEle对象，送入scheduel
+  element: ReactNodeList, // reactElement对象，为要挂载的reactEle对象
+  container: OpaqueRoot, // fiberRoot对象，实际上之用到了current指向的rootFiber
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
 ): Lane {
@@ -329,15 +329,15 @@ export function updateContainer(
     onScheduleRoot(container, element);
   }
   const current = container.current;
-  const eventTime = requestEventTime();
-  const lane = requestUpdateLane(current);
+  const eventTime = requestEventTime(); // 获取当前事件戳
+  const lane = requestUpdateLane(current); // 根据rootfiber获取lane优先级
 
-  if (enableSchedulingProfiler) {
+  if (enableSchedulingProfiler) { // 先不管
     markRenderScheduled(lane);
   }
 
-  const context = getContextForSubtree(parentComponent);
-  if (container.context === null) {
+  const context = getContextForSubtree(parentComponent); // 获取parentCompoent的context,第一次为空的{}
+  if (container.context === null) { // 如果fiberroot上的context为null，就赋初值
     container.context = context;
   } else {
     container.pendingContext = context;
@@ -352,9 +352,9 @@ export function updateContainer(
       didWarnAboutNestedUpdates = true;
       console.error(
         'Render methods should be a pure function of props and state; ' +
-          'triggering nested component updates from render is not allowed. ' +
-          'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
-          'Check the render method of %s.',
+        'triggering nested component updates from render is not allowed. ' +
+        'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
+        'Check the render method of %s.',
         getComponentNameFromFiber(ReactCurrentFiberCurrent) || 'Unknown',
       );
     }
@@ -363,15 +363,15 @@ export function updateContainer(
   const update = createUpdate(eventTime, lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
-  update.payload = {element};
+  update.payload = { element }; // 把reactEle放在payload中
 
   callback = callback === undefined ? null : callback;
-  if (callback !== null) {
+  if (callback !== null) { // 有cb在update中存入cb
     if (__DEV__) {
       if (typeof callback !== 'function') {
         console.error(
           'render(...): Expected the last optional `callback` argument to be a ' +
-            'function. Instead received: %s.',
+          'function. Instead received: %s.',
           callback,
         );
       }
@@ -379,7 +379,7 @@ export function updateContainer(
     update.callback = callback;
   }
 
-  const root = enqueueUpdate(current, update, lane);
+  const root = enqueueUpdate(current, update, lane);// 把这个更新加入更新队列，返回对应的fiberRoot
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);
     entangleTransitions(root, current, lane);
@@ -511,11 +511,11 @@ export function attemptHydrationAtCurrentPriority(fiber: Fiber): void {
   markRetryLaneIfNotHydrated(fiber, lane);
 }
 
-export {getCurrentUpdatePriority, runWithPriority};
+export { getCurrentUpdatePriority, runWithPriority };
 
-export {findHostInstance};
+export { findHostInstance };
 
-export {findHostInstanceWithWarning};
+export { findHostInstanceWithWarning };
 
 export function findHostInstanceWithNoPortals(
   fiber: Fiber,
@@ -556,7 +556,7 @@ if (__DEV__) {
     index: number,
   ) => {
     const key = path[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
+    const updated = isArray(obj) ? obj.slice() : { ...obj };
     if (index + 1 === path.length) {
       if (isArray(updated)) {
         updated.splice(((key: any): number), 1);
@@ -584,7 +584,7 @@ if (__DEV__) {
     index: number,
   ) => {
     const oldKey = oldPath[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
+    const updated = isArray(obj) ? obj.slice() : { ...obj };
     if (index + 1 === oldPath.length) {
       const newKey = newPath[index];
       // $FlowFixMe number or string is fine here
@@ -638,7 +638,7 @@ if (__DEV__) {
       return value;
     }
     const key = path[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
+    const updated = isArray(obj) ? obj.slice() : { ...obj };
     // $FlowFixMe number or string is fine here
     updated[key] = copyWithSetImpl(obj[key], path, index + 1, value);
     return updated;
@@ -681,7 +681,7 @@ if (__DEV__) {
       // (There's no appropriate action type for DevTools overrides.)
       // As a result though, React will see the scheduled update as a noop and bailout.
       // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
+      fiber.memoizedProps = { ...fiber.memoizedProps };
 
       const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
       if (root !== null) {
@@ -705,7 +705,7 @@ if (__DEV__) {
       // (There's no appropriate action type for DevTools overrides.)
       // As a result though, React will see the scheduled update as a noop and bailout.
       // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
+      fiber.memoizedProps = { ...fiber.memoizedProps };
 
       const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
       if (root !== null) {
@@ -730,7 +730,7 @@ if (__DEV__) {
       // (There's no appropriate action type for DevTools overrides.)
       // As a result though, React will see the scheduled update as a noop and bailout.
       // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
+      fiber.memoizedProps = { ...fiber.memoizedProps };
 
       const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
       if (root !== null) {
@@ -810,8 +810,8 @@ function getCurrentFiberForDevTools() {
 }
 
 export function injectIntoDevTools(devToolsConfig: DevToolsConfig): boolean {
-  const {findFiberByHostInstance} = devToolsConfig;
-  const {ReactCurrentDispatcher} = ReactSharedInternals;
+  const { findFiberByHostInstance } = devToolsConfig;
+  const { ReactCurrentDispatcher } = ReactSharedInternals;
 
   return injectInternals({
     bundleType: devToolsConfig.bundleType,

@@ -7,7 +7,7 @@
  * @flow
  */
 
-import type {Source} from 'shared/ReactElementType';
+import type { Source } from 'shared/ReactElementType';
 import type {
   RefObject,
   ReactContext,
@@ -19,23 +19,23 @@ import type {
   Wakeable,
   Usable,
 } from 'shared/ReactTypes';
-import type {WorkTag} from './ReactWorkTags';
-import type {TypeOfMode} from './ReactTypeOfMode';
-import type {Flags} from './ReactFiberFlags';
-import type {Lane, Lanes, LaneMap} from './ReactFiberLane';
-import type {RootTag} from './ReactRootTags';
+import type { WorkTag } from './ReactWorkTags';
+import type { TypeOfMode } from './ReactTypeOfMode';
+import type { Flags } from './ReactFiberFlags';
+import type { Lane, Lanes, LaneMap } from './ReactFiberLane';
+import type { RootTag } from './ReactRootTags';
 import type {
   Container,
   TimeoutHandle,
   NoTimeout,
   SuspenseInstance,
 } from './ReactFiberHostConfig';
-import type {Cache} from './ReactFiberCacheComponent';
+import type { Cache } from './ReactFiberCacheComponent';
 import type {
   TracingMarkerInstance,
   Transition,
 } from './ReactFiberTracingMarkerComponent';
-import type {ConcurrentUpdate} from './ReactFiberConcurrentUpdates';
+import type { ConcurrentUpdate } from './ReactFiberConcurrentUpdates';
 
 // Unwind Circular: moved from ReactFiberHooks.old
 export type HookType =
@@ -125,9 +125,9 @@ export type Fiber = {
   // The ref last used to attach this node.
   // I'll avoid adding an owner field for prod and model that as functions.
   ref:
-    | null
-    | (((handle: mixed) => void) & {_stringRef: ?string, ...})
-    | RefObject,
+  | null
+  | (((handle: mixed) => void) & { _stringRef: ?string, ... })
+  | RefObject,
 
   refCleanup: null | (() => void),
 
@@ -136,7 +136,7 @@ export type Fiber = {
   memoizedProps: any, // The props used to create the output.
 
   // A queue of state updates and callbacks.
-  updateQueue: mixed,
+  updateQueue: mixed, // 用于存放state的更新和回调，和hook有关
 
   // The state used to create the output
   memoizedState: any,
@@ -256,7 +256,7 @@ type BaseFiberRootProperties = {
   entangledLanes: Lanes,
   entanglements: LaneMap<Lanes>,
 
-  pooledCache: Cache | null,
+  pooledCache: Cache | null, // 在最开始创建fiberroot的时候创建，具体干什么暂时不管
   pooledCacheLanes: Lanes,
 
   // TODO: In Fizz, id generation is specific to each server config. Maybe we
@@ -268,7 +268,7 @@ type BaseFiberRootProperties = {
 
   onRecoverableError: (
     error: mixed,
-    errorInfo: {digest?: ?string, componentStack?: ?string},
+    errorInfo: { digest?: ?string, componentStack?: ?string },
   ) => void,
 };
 
@@ -296,7 +296,7 @@ export type TransitionTracingCallbacks = {
     transitionName: string,
     startTime: number,
     currentTime: number,
-    pending: Array<{name: null | string}>,
+    pending: Array<{ name: null | string }>,
   ) => void,
   onTransitionIncomplete?: (
     transitionName: string,
@@ -317,7 +317,7 @@ export type TransitionTracingCallbacks = {
     marker: string,
     startTime: number,
     currentTime: number,
-    pending: Array<{name: null | string}>,
+    pending: Array<{ name: null | string }>,
   ) => void,
   onMarkerIncomplete?: (
     transitionName: string,
@@ -366,59 +366,59 @@ type Dispatch<A> = A => void;
 
 export type Dispatcher = {
   use?: <T>(Usable<T>) => T,
-  readContext<T>(context: ReactContext<T>): T,
-  useState<S>(initialState: (() => S) | S): [S, Dispatch<BasicStateAction<S>>],
-  useReducer<S, I, A>(
-    reducer: (S, A) => S,
-    initialArg: I,
-    init?: (I) => S,
-  ): [S, Dispatch<A>],
-  useContext<T>(context: ReactContext<T>): T,
-  useRef<T>(initialValue: T): {current: T},
-  useEffect(
-    create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
-  ): void,
-  useEffectEvent?: <Args, Return, F: (...Array<Args>) => Return>(
+    readContext < T > (context: ReactContext < T >): T,
+      useState < S > (initialState: (() => S) | S): [S, Dispatch < BasicStateAction < S >>],
+        useReducer < S, I, A > (
+          reducer: (S, A) => S,
+            initialArg: I,
+              init ?: (I) => S,
+  ): [S, Dispatch < A >],
+  useContext < T > (context: ReactContext < T >): T,
+    useRef < T > (initialValue: T): { current: T },
+useEffect(
+  create: () => (() => void) | void,
+  deps: Array < mixed > | void | null,
+): void,
+  useEffectEvent ?: <Args, Return, F: (...Array<Args>) => Return > (
     callback: F,
   ) => F,
   useInsertionEffect(
     create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
+    deps: Array < mixed > | void | null,
   ): void,
-  useLayoutEffect(
-    create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
+    useLayoutEffect(
+      create: () => (() => void) | void,
+      deps: Array < mixed > | void | null,
+    ): void,
+      useCallback < T > (callback: T, deps: Array < mixed > | void | null): T,
+        useMemo < T > (nextCreate: () => T, deps: Array < mixed > | void | null): T,
+          useImperativeHandle < T > (
+            ref: { current: T | null } | ((inst: T | null) => mixed) | null | void,
+              create: () => T,
+                deps: Array < mixed > | void | null,
   ): void,
-  useCallback<T>(callback: T, deps: Array<mixed> | void | null): T,
-  useMemo<T>(nextCreate: () => T, deps: Array<mixed> | void | null): T,
-  useImperativeHandle<T>(
-    ref: {current: T | null} | ((inst: T | null) => mixed) | null | void,
-    create: () => T,
-    deps: Array<mixed> | void | null,
-  ): void,
-  useDebugValue<T>(value: T, formatterFn: ?(value: T) => mixed): void,
-  useDeferredValue<T>(value: T): T,
-  useTransition(): [
-    boolean,
-    (callback: () => void, options?: StartTransitionOptions) => void,
-  ],
-  useMutableSource<Source, Snapshot>(
-    source: MutableSource<Source>,
-    getSnapshot: MutableSourceGetSnapshotFn<Source, Snapshot>,
-    subscribe: MutableSourceSubscribeFn<Source, Snapshot>,
+  useDebugValue < T > (value: T, formatterFn: ?(value: T) => mixed): void,
+    useDeferredValue < T > (value: T): T,
+      useTransition(): [
+        boolean,
+        (callback: () => void, options?: StartTransitionOptions) => void,
+      ],
+        useMutableSource < Source, Snapshot > (
+          source: MutableSource < Source >,
+            getSnapshot: MutableSourceGetSnapshotFn < Source, Snapshot >,
+              subscribe: MutableSourceSubscribeFn < Source, Snapshot >,
   ): Snapshot,
-  useSyncExternalStore<T>(
+  useSyncExternalStore < T > (
     subscribe: (() => void) => () => void,
-    getSnapshot: () => T,
-    getServerSnapshot?: () => T,
+      getSnapshot: () => T,
+        getServerSnapshot ?: () => T,
   ): T,
   useId(): string,
-  useCacheRefresh?: () => <T>(?() => T, ?T) => void,
+    useCacheRefresh ?: () => <T>(?() => T, ?T) => void,
   useMemoCache?: (size: number) => Array<any>,
 };
 
-export type CacheDispatcher = {
-  getCacheSignal: () => AbortSignal,
-  getCacheForType: <T>(resourceType: () => T) => T,
+        export type CacheDispatcher = {
+          getCacheSignal: () => AbortSignal,
+        getCacheForType: <T>(resourceType: () => T) => T,
 };

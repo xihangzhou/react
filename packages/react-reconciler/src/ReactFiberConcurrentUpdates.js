@@ -7,7 +7,7 @@
  * @flow
  */
 
-import type {Fiber, FiberRoot} from './ReactInternalTypes';
+import type { Fiber, FiberRoot } from './ReactInternalTypes';
 import type {
   UpdateQueue as HookQueue,
   Update as HookUpdate,
@@ -16,18 +16,18 @@ import type {
   SharedQueue as ClassQueue,
   Update as ClassUpdate,
 } from './ReactFiberClassUpdateQueue';
-import type {Lane, Lanes} from './ReactFiberLane';
-import type {OffscreenInstance} from './ReactFiberOffscreenComponent';
+import type { Lane, Lanes } from './ReactFiberLane';
+import type { OffscreenInstance } from './ReactFiberOffscreenComponent';
 
 import {
   warnAboutUpdateOnNotYetMountedFiberInDEV,
   throwIfInfiniteUpdateLoopDetected,
   getWorkInProgressRoot,
 } from './ReactFiberWorkLoop';
-import {NoLane, NoLanes, mergeLanes, markHiddenUpdate} from './ReactFiberLane';
-import {NoFlags, Placement, Hydrating} from './ReactFiberFlags';
-import {HostRoot, OffscreenComponent} from './ReactWorkTags';
-import {OffscreenVisible} from './ReactFiberOffscreenComponent';
+import { NoLane, NoLanes, mergeLanes, markHiddenUpdate } from './ReactFiberLane';
+import { NoFlags, Placement, Hydrating } from './ReactFiberFlags';
+import { HostRoot, OffscreenComponent } from './ReactWorkTags';
+import { OffscreenVisible } from './ReactFiberOffscreenComponent';
 
 export type ConcurrentUpdate = {
   next: ConcurrentUpdate,
@@ -86,20 +86,20 @@ export function getConcurrentlyUpdatedLanes(): Lanes {
   return concurrentlyUpdatedLanes;
 }
 
-function enqueueUpdate(
-  fiber: Fiber,
-  queue: ConcurrentQueue | null,
-  update: ConcurrentUpdate | null,
-  lane: Lane,
+function enqueueUpdate( // 把这次更新的相关信息放入concurrentQueues,更新concurrentlyUpdatedLanes以及这个fiber的lane和对应缓冲树上的lanes
+  fiber: Fiber, // fiber节点
+  queue: ConcurrentQueue | null, // hook共享的queue
+  update: ConcurrentUpdate | null, // update对象
+  lane: Lane, // 本次更新优先级
 ) {
   // Don't update the `childLanes` on the return path yet. If we already in
   // the middle of rendering, wait until after it has completed.
-  concurrentQueues[concurrentQueuesIndex++] = fiber;
+  concurrentQueues[concurrentQueuesIndex++] = fiber; // 四个为一组，对应如下的信息
   concurrentQueues[concurrentQueuesIndex++] = queue;
   concurrentQueues[concurrentQueuesIndex++] = update;
   concurrentQueues[concurrentQueuesIndex++] = lane;
 
-  concurrentlyUpdatedLanes = mergeLanes(concurrentlyUpdatedLanes, lane);
+  concurrentlyUpdatedLanes = mergeLanes(concurrentlyUpdatedLanes, lane); // 更新concurrentlyUpdatedLanes
 
   // The fiber's `lane` field is used in some places to check if any work is
   // scheduled, to perform an eager bailout, so we need to update it immediately.
@@ -151,14 +151,14 @@ export function enqueueConcurrentHookUpdateAndEagerlyBailout<S, A>(
 
 export function enqueueConcurrentClassUpdate<State>(
   fiber: Fiber,
-  queue: ClassQueue<State>,
-  update: ClassUpdate<State>,
-  lane: Lane,
+  queue: ClassQueue<State>, // 一个fiber节点上所有的hooks的共有状态
+  update: ClassUpdate<State>, // 本次更新的更新对象
+  lane: Lane, // 本次更新的优先级
 ): FiberRoot | null {
   const concurrentQueue: ConcurrentQueue = (queue: any);
   const concurrentUpdate: ConcurrentUpdate = (update: any);
   enqueueUpdate(fiber, concurrentQueue, concurrentUpdate, lane);
-  return getRootForUpdatedFiber(fiber);
+  return getRootForUpdatedFiber(fiber); // 返回这个fiber对应的fiberRoot
 }
 
 export function enqueueConcurrentRenderForLane(
@@ -244,13 +244,13 @@ function markUpdateLaneFromFiberToRoot(
   }
 }
 
-function getRootForUpdatedFiber(sourceFiber: Fiber): FiberRoot | null {
+function getRootForUpdatedFiber(sourceFiber: Fiber): FiberRoot | null { // 给一个sourceFiber，返回对应的挂载节点上的fiberRoot(一次createRoot就对应一个fiberRoot)
   // TODO: We will detect and infinite update loop and throw even if this fiber
   // has already unmounted. This isn't really necessary but it happens to be the
   // current behavior we've used for several release cycles. Consider not
   // performing this check if the updated fiber already unmounted, since it's
   // not possible for that to cause an infinite update loop.
-  throwIfInfiniteUpdateLoopDetected();
+  throwIfInfiniteUpdateLoopDetected(); // 如果无限
 
   // When a setState happens, we must ensure the root is scheduled. Because
   // update queues do not have a backpointer to the root, the only way to do
