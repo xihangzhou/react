@@ -132,7 +132,7 @@ export const NoTimestamp = -1;
 let nextTransitionLane: Lane = TransitionLane1;
 let nextRetryLane: Lane = RetryLane1;
 
-function getHighestPriorityLanes(lanes: Lanes | Lane): Lanes {
+function getHighestPriorityLanes(lanes: Lanes | Lane): Lanes { // 返回一个lanes中最高优先级的lane
   switch (getHighestPriorityLane(lanes)) {
     case SyncHydrationLane:
       return SyncHydrationLane;
@@ -203,12 +203,12 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
 
   // Do not work on any idle work until all the non-idle work has finished,
   // even if the work is suspended.
-  const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
-  if (nonIdlePendingLanes !== NoLanes) {
+  const nonIdlePendingLanes = pendingLanes & NonIdleLanes; // 去除了NonIdleLanes的lanes
+  if (nonIdlePendingLanes !== NoLanes) { // 如果有nonIdlePendingLanes
     const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
-    if (nonIdleUnblockedLanes !== NoLanes) {
+    if (nonIdleUnblockedLanes !== NoLanes) { // 如果有除了idlelane,suspendlane之外的其他的lane,就从这里面找最高优先级的lanes
       nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
-    } else {
+    } else { //否则从pingedlane和nonIdlePendingLanes中找
       const nonIdlePingedLanes = nonIdlePendingLanes & pingedLanes;
       if (nonIdlePingedLanes !== NoLanes) {
         nextLanes = getHighestPriorityLanes(nonIdlePingedLanes);
@@ -235,7 +235,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
   // If we're already in the middle of a render, switching lanes will interrupt
   // it and we'll lose our progress. We should only do this if the new lanes are
   // higher priority.
-  if (
+  if ( // 如果有正在进行的lanes,并且这个正在进行的lane不为nextLanes(最高优先级的lane),并且这个wipLane也没有被挂起
     wipLanes !== NoLanes &&
     wipLanes !== nextLanes &&
     // If we already suspended with a delay, then interrupting is fine. Don't
@@ -244,7 +244,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
   ) {
     const nextLane = getHighestPriorityLane(nextLanes);
     const wipLane = getHighestPriorityLane(wipLanes);
-    if (
+    if ( // 如果nextlane的优先级和wipLane相等或者wipLane优先级更高应该返回wipLanes
       // Tests whether the next lane is equal or lower priority than the wip
       // one. This works because the bits decrease in priority as you go left.
       nextLane >= wipLane ||
@@ -293,7 +293,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
   // For those exceptions where entanglement is semantically important, like
   // useMutableSource, we should ensure that there is no partial work at the
   // time we apply the entanglement.
-  const entangledLanes = root.entangledLanes;
+  const entangledLanes = root.entangledLanes; // 先不管这个entangledLanes
   if (entangledLanes !== NoLanes) {
     const entanglements = root.entanglements;
     let lanes = nextLanes & entangledLanes;
@@ -329,7 +329,7 @@ export function getMostRecentEventTime(root: FiberRoot, lanes: Lanes): number {
   return mostRecentEventTime;
 }
 
-function computeExpirationTime(lane: Lane, currentTime: number) {
+function computeExpirationTime(lane: Lane, currentTime: number) { // 根据一个lane的性质和现在的时间计算出expirationTime过期时间
   switch (lane) {
     case SyncHydrationLane:
     case SyncLane:
@@ -400,8 +400,8 @@ export function markStarvedLanesAsExpired(
   // of this function.
 
   const pendingLanes = root.pendingLanes;
-  const suspendedLanes = root.suspendedLanes;
-  const pingedLanes = root.pingedLanes;
+  const suspendedLanes = root.suspendedLanes; // 挂起的lanes
+  const pingedLanes = root.pingedLanes; // 暂时还不知道这个linedLanes是用来干嘛的
   const expirationTimes = root.expirationTimes;
 
   // Iterate through the pending lanes and check if we've reached their
@@ -411,13 +411,13 @@ export function markStarvedLanesAsExpired(
   // We exclude retry lanes because those must always be time sliced, in order
   // to unwrap uncached promises.
   // TODO: Write a test for this
-  let lanes = pendingLanes & ~RetryLanes;
+  let lanes = pendingLanes & ~RetryLanes; // 去掉retryLanes
   while (lanes > 0) {
-    const index = pickArbitraryLaneIndex(lanes);
-    const lane = 1 << index;
+    const index = pickArbitraryLaneIndex(lanes); // 获取lanes长度作为index
+    const lane = 1 << index; // 获取lanes中的最高位
 
     const expirationTime = expirationTimes[index];
-    if (expirationTime === NoTimestamp) {
+    if (expirationTime === NoTimestamp) { // 如果这个lane没有expirationTime就给一个expirationTime
       // Found a pending lane with no expiration time. If it's not suspended, or
       // if it's pinged, assume it's CPU-bound. Compute a new expiration time
       // using the current time.
@@ -428,12 +428,12 @@ export function markStarvedLanesAsExpired(
         // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }
-    } else if (expirationTime <= currentTime) {
+    } else if (expirationTime <= currentTime) { // 否则就把这个lane加入expiredLanes中标记过期
       // This lane expired
       root.expiredLanes |= lane;
     }
 
-    lanes &= ~lane;
+    lanes &= ~lane; // 然后在lanes中去除这个最高位的lane
   }
 }
 
@@ -529,8 +529,8 @@ export function claimNextRetryLane(): Lane {
   return lane;
 }
 
-export function getHighestPriorityLane(lanes: Lanes): Lane {
-  return lanes & -lanes;
+export function getHighestPriorityLane(lanes: Lanes): Lane { // 获取一个lanes中最高优先级的lane，即最低位的lane
+  return lanes & -lanes; // 二进制表示负数是先取反码再+1, 所以取&了过后可以做到取最低位的lane
 }
 
 export function pickArbitraryLane(lanes: Lanes): Lane {
@@ -590,7 +590,7 @@ export function createLaneMap<T>(initial: T): LaneMap<T> {
   return laneMap;
 }
 
-export function markRootUpdated(
+export function markRootUpdated( // 把fiberroot上的pendingLanes加入这次更新的lane，并且更新这次updateLane的evetTimes
   root: FiberRoot,
   updateLane: Lane,
   eventTime: number,

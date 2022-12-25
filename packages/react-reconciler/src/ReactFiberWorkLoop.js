@@ -728,9 +728,9 @@ export function scheduleUpdateOnFiber(
   }
 
   // Mark that the root has a pending update.
-  markRootUpdated(root, lane, eventTime);
+  markRootUpdated(root, lane, eventTime); // 通过标记pendingLanes标记fiberroot有哪些更新的lane
 
-  if (
+  if ( // 执行上下文包括RenderContext，第一次渲染executionContext为0先不管
     (executionContext & RenderContext) !== NoLanes &&
     root === workInProgressRoot
   ) {
@@ -749,7 +749,7 @@ export function scheduleUpdateOnFiber(
   } else {
     // This is a normal update, scheduled from outside the render phase. For
     // example, during an input event.
-    if (enableUpdaterTracking) {
+    if (enableUpdaterTracking) { // 不管
       if (isDevToolsPresent) {
         addFiberToLanesMap(root, fiber, lane);
       }
@@ -757,7 +757,7 @@ export function scheduleUpdateOnFiber(
 
     warnIfUpdatesNotWrappedWithActDEV(fiber);
 
-    if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
+    if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) { // 分析工具不管
       if (
         (executionContext & CommitContext) !== NoContext &&
         root === rootCommittingMutationOrLayoutEffects
@@ -777,7 +777,7 @@ export function scheduleUpdateOnFiber(
       }
     }
 
-    if (enableTransitionTracing) {
+    if (enableTransitionTracing) { // transition先不管
       const transition = ReactCurrentBatchConfig.transition;
       if (transition !== null && transition.name != null) {
         if (transition.startTime === -1) {
@@ -788,7 +788,7 @@ export function scheduleUpdateOnFiber(
       }
     }
 
-    if (root === workInProgressRoot) {
+    if (root === workInProgressRoot) { // 先不管
       // Received an update to a tree that's in the middle of rendering. Mark
       // that there was an interleaved update work on this root. Unless the
       // `deferRenderPhaseUpdateToNextBatch` flag is off and this is a render
@@ -883,10 +883,10 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
     root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
   );
 
-  if (nextLanes === NoLanes) {
+  if (nextLanes === NoLanes) { // 如果nextLanes为空就去执行existingCallbackNode
     // Special case: There's nothing to work on.
     if (existingCallbackNode !== null) {
-      cancelCallback(existingCallbackNode);
+      cancelCallback(existingCallbackNode); // 在scheduler中取消回调
     }
     root.callbackNode = null;
     root.callbackPriority = NoLane;
@@ -974,7 +974,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
     newCallbackNode = null;
   } else {
     let schedulerPriorityLevel;
-    switch (lanesToEventPriority(nextLanes)) {
+    switch (lanesToEventPriority(nextLanes)) { // 将lane优先级先转为事件优先级，再和schedule调度优先级做对应
       case DiscreteEventPriority:
         schedulerPriorityLevel = ImmediateSchedulerPriority;
         break;
@@ -992,8 +992,8 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
         break;
     }
     newCallbackNode = scheduleCallback(
-      schedulerPriorityLevel,
-      performConcurrentWorkOnRoot.bind(null, root),
+      schedulerPriorityLevel, // 通过lane计算出来的schedulerPriorityLevel
+      performConcurrentWorkOnRoot.bind(null, root), // 传入了performConcurrentWorkOnRoot函数为cb进行调度
     );
   }
 
@@ -3906,7 +3906,7 @@ function scheduleCallback(priorityLevel, callback) {
     if (actQueue !== null) {
       actQueue.push(callback);
       return fakeActCallbackNode;
-    } else {
+    } else { // 先不管actQueue，都以生产环境的来读
       return Scheduler_scheduleCallback(priorityLevel, callback);
     }
   } else {
