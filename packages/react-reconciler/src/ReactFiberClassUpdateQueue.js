@@ -222,7 +222,7 @@ export function createUpdate(eventTime: number, lane: Lane): Update<mixed> {// �
   return update;
 }
 
-export function enqueueUpdate<State>( // 把update对象入队等待更新,更新fiber上的lane
+export function enqueueUpdate<State>( // 把update对象入concurrentQueues队等待更新,更新fiber上的lane
   fiber: Fiber, // 入队更新的fiber节点
   update: Update<State>, // 更新对象
   lane: Lane, // 本次更新入队的优先级

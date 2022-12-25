@@ -360,7 +360,7 @@ export function updateContainer( // 传入本次更新的fiberRoot,以及新的r
     }
   }
 
-  const update = createUpdate(eventTime, lane);
+  const update = createUpdate(eventTime, lane); // 新建一个update对象
   // Caution: React DevTools currently depends on this property
   // being called "element".
   update.payload = { element }; // 把reactEle放在payload中
@@ -379,9 +379,9 @@ export function updateContainer( // 传入本次更新的fiberRoot,以及新的r
     update.callback = callback;
   }
 
-  const root = enqueueUpdate(current, update, lane);// 把这个更新加入更新队列，返回对应的fiberRoot
+  const root = enqueueUpdate(current, update, lane);// 把这个更新加入concurrentQueues更新队列，返回对应的fiberRoot
   if (root !== null) {
-    scheduleUpdateOnFiber(root, current, lane, eventTime);
+    scheduleUpdateOnFiber(root, current, lane, eventTime); // 注册这个update到调度器更新
     entangleTransitions(root, current, lane);
   }
 

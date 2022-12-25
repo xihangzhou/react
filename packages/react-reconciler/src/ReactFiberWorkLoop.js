@@ -870,7 +870,7 @@ export function isUnsafeClassRenderPhaseUpdate(fiber: Fiber): boolean {
 // of the existing task is the same as the priority of the next level that the
 // root has work on. This function is called on every update, and right before
 // exiting a task.
-function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
+function ensureRootIsScheduled(root: FiberRoot, currentTime: number) { // 为一个fiberRoot调度一个task,一个fiber root只有一个task，如果已经有task再调度，那么我们会检查优先级
   const existingCallbackNode = root.callbackNode;
 
   // Check if any lanes are being starved by other work. If so, mark them as
@@ -991,13 +991,13 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
-    newCallbackNode = scheduleCallback(
+    newCallbackNode = scheduleCallback( // 注册调度器
       schedulerPriorityLevel, // 通过lane计算出来的schedulerPriorityLevel
       performConcurrentWorkOnRoot.bind(null, root), // 传入了performConcurrentWorkOnRoot函数为cb进行调度
     );
   }
 
-  root.callbackPriority = newCallbackPriority;
+  root.callbackPriority = newCallbackPriority; // 把本次正在执行的newCallbackPriority和newCallbackNode绑定到root上
   root.callbackNode = newCallbackNode;
 }
 
@@ -1020,7 +1020,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   // Flush any pending passive effects before deciding which lanes to work on,
   // in case they schedule additional work.
   const originalCallbackNode = root.callbackNode;
-  const didFlushPassiveEffects = flushPassiveEffects();
+  const didFlushPassiveEffects = flushPassiveEffects();//  刷新pending状态的effects, 有可能某些effect会取消本次任务
   if (didFlushPassiveEffects) {
     // Something in the passive effect phase may have canceled the current task.
     // Check if the task node for this root was changed.
@@ -1147,7 +1147,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     }
   }
 
-  ensureRootIsScheduled(root, now());
+  ensureRootIsScheduled(root, now()); // 退出前再次检测, 是否还有其他更新, 是否需要发起新调度
   if (root.callbackNode === originalCallbackNode) {
     // The task node scheduled for this root is the same one that's
     // currently executed. Need to return a continuation.
@@ -2677,7 +2677,7 @@ function commitRootImpl(
 
   // commitRoot never returns a continuation; it always finishes synchronously.
   // So we can clear these now to allow a new callback to be scheduled.
-  root.callbackNode = null;
+  root.callbackNode = null; // 清空FiberRoot对象上的属性
   root.callbackPriority = NoLane;
 
   // Check which lanes no longer have any work scheduled on them, and mark
@@ -3049,7 +3049,7 @@ export function flushPassiveEffects(): boolean {
   // in the first place because we used to wrap it with
   // `Scheduler.runWithPriority`, which accepts a function. But now we track the
   // priority within React itself, so we can mutate the variable directly.
-  if (rootWithPendingPassiveEffects !== null) {
+  if (rootWithPendingPassiveEffects !== null) { // 先不管，第一次rootWithPendingPassiveEffects为null
     // Cache the root since rootWithPendingPassiveEffects is cleared in
     // flushPassiveEffectsImpl
     const root = rootWithPendingPassiveEffects;

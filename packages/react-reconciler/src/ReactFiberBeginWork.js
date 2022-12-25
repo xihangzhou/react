@@ -3925,7 +3925,7 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
   return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
 }
 
-function beginWork(
+function beginWork( // 从workInProgress这个fiber节点开始构建起子fiber
   current: Fiber | null,
   workInProgress: Fiber,
   renderLanes: Lanes,

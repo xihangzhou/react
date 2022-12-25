@@ -482,7 +482,7 @@ export function includesOnlyTransitions(lanes: Lanes): boolean {
   return (lanes & TransitionLanes) === lanes;
 }
 
-export function includesBlockingLane(root: FiberRoot, lanes: Lanes): boolean {
+export function includesBlockingLane(root: FiberRoot, lanes: Lanes): boolean { // 是否是blocking lane，如果是第一次渲染为default lane的话也为blocking lane
   if (
     allowConcurrentByDefault &&
     (root.current.mode & ConcurrentUpdatesByDefaultMode) !== NoMode
